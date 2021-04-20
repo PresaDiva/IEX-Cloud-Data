@@ -1,9 +1,10 @@
 import requests
 import json
 from pandas.io.json import json_normalize
+import numpy as np
 import pandas as pd
 
-def get_quote(ticker,range = 'YTD'):
+def get_quote(ticker,key,range = 'YTD'):
   """
   Returns the historic daily stock prices for one ticker
   API Documentation
@@ -18,16 +19,13 @@ def get_quote(ticker,range = 'YTD'):
   base_url = 'https://sandbox.iexapis.com/'+'stable/stock/'
   url = base_url + ticker + '/chart/' + range
   company = requests.get(url, params = {"token": key})
-  if company.status_code != 200:
-    print(company)
+  if company.status_code != 200: print(company) #Error Checking
   company = company.json()
   company = pd.DataFrame(company)
   temp = pd.concat([temp,company]).drop_duplicates()
   return temp
 
-
-
-def get_daily_stocks(tickers,range = 'ytd',return_value = 'close'):
+def get_daily_stocks(tickers,key,range = 'ytd',return_value = 'close'):
     """
     Returns daily stock data for entered tickers.
     -- Tickers -> List[] of stock tickers
@@ -38,7 +36,7 @@ def get_daily_stocks(tickers,range = 'ytd',return_value = 'close'):
     """
     temp = pd.DataFrame()
     for i,t in enumerate(tickers):
-      stock_temp = get_quote(t,range)
+      stock_temp = get_quote(t,key,range)
       if i == 0:
         temp['date'] = stock_temp['date']
         temp[t] = stock_temp[return_value]
